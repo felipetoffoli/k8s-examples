@@ -1,0 +1,10 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: my-storage-class
+provisioner: kubernetes.io/nfs
+parameters:
+  type: nfs
+  server: 10.100.1.82
+  path: /var/public/Infra
+volumeBindingMode: Immediate
