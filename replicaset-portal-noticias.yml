@@ -18,6 +18,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: configmap-portal-noticias
+          
   selector:
     matchLabels:
       app: portal-noticias

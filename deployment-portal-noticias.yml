@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: deployment-portal-noticias
 spec:
-  replicas: 3
+  replicas: 1
   template:
     metadata:
       name: portal-noticias
@@ -18,6 +18,20 @@ spec:
           envFrom:
             - configMapRef:
                 name: configmap-portal-noticias
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            periodSeconds: 10
+            failureThreshold: 3
+            initialDelaySeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            periodSeconds: 10
+            failureThreshold: 5
+            initialDelaySeconds: 3
   selector:
     matchLabels:
       app: portal-noticias

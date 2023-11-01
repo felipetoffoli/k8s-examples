@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: pvc-1
+  name: meu-pvc
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
+  storageClassName: nfsprodinfra  # Para usar a StorageClass padrão
   resources:
     requests:
-      storage: 5Gi
-  storageClassName: standard
+      storage: 100Gi  # Solicitação de 5 gigabytes de armazenamento

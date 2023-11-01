@@ -1,15 +1,15 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: pv-1
+  name: nfsprodinfra
 spec:
   capacity:
-    storage: 5Gi
+    storage: 100Gi
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: standard
+  storageClassName: nfsprodinfra
   mountOptions:
     - hard
     - nfsvers=4.1
