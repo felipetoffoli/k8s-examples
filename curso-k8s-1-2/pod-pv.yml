@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: meu-pod
+  namespace: default  # ou o namespace desejado
+spec:
+  containers:
+  - name: nginx-container
+    image: nginx:latest
+    volumeMounts:
+    - name: meu-pv
+      mountPath: /var/www/html  # Caminho onde o PV será montado dentro do container
+  volumes:
+  - name: meu-pv
+    persistentVolumeClaim:
+      claimName: meu-pvc  # Nome do PVC associado ao PV
