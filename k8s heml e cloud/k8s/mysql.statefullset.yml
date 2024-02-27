@@ -5,45 +5,37 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: mysql-vollmed # has to match .spec.template.metadata.labels
+      app: mysql-vollmed
   serviceName: "mysql-vollmed"
-  replicas: 1 # by default is 1
-  minReadySeconds: 10 # by default is 0
+  replicas: 1
+  minReadySeconds: 10
   template:
     metadata:
       labels:
-        app: mysql-vollmed # has to match .spec.selector.matchLabels
+        app: mysql-vollmed
     spec:
       terminationGracePeriodSeconds: 10
+      volumes:  # Definindo volumes no nível do pod
+      - name: voll-med-mysql-ps
+        persistentVolumeClaim:
+          claimName: voll-med-mysql-pvc
       containers:
       - name: mysql-vollmed
-        image: mysql:8.3.0
+        image: mysql:8
         ports:
         - containerPort: 3306
           name: mysql
         volumeMounts:
-        - name: conf.d
-          mountPath: /etc/mysql/conf.d
-        
+        - name: voll-med-mysql-ps
+          mountPath: /var/lib/mysql
         env:
-
-          - name: MYSQL_DATABASE # Note que aqui a variável está definida em caixa alta,
-                                      # diferente da chave no ConfigMap.
+          - name: MYSQL_DATABASE
             valueFrom:
               configMapKeyRef:
-                name: voll-med-configmap           # O ConfigMap de onde esse valor vem.
-                key: DB_DATABASE # A chave que deve ser buscada.
+                name: voll-med-configmap
+                key: DB_DATABASE
           - name: MYSQL_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: voll-med-secret
                 key: DB_PASSWORD
-  volumeClaimTemplates:
-  - metadata:
-      name: www
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      storageClassName: "my-storage-class"
-      resources:
-        requests:
-          storage: 1Gi
