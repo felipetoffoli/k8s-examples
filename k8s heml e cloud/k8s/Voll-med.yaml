@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vollmed
+  labels:
+    app: vollmed
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: vollmed
+  template:
+    metadata:
+      labels:
+        app: vollmed
+    spec:
+      containers:
+      - name: vollmed-api
+        image: leonardosartorello/vollmed:v8
+        ports:
+        - containerPort: 3000
+        env:
+        # Define as variáveis de ambiente
+        - name: DB_HOST # Note que aqui a variável está definida em caixa alta,
+                                     # diferente da chave no ConfigMap.
+          valueFrom:
+            configMapKeyRef:
+              name: voll-med-configmap           # O ConfigMap de onde esse valor vem.
+              key: DB_HOST # A chave que deve ser buscada.
+        - name: DB_DATABASE # Note que aqui a variável está definida em caixa alta,
+                                     # diferente da chave no ConfigMap.
+          valueFrom:
+            configMapKeyRef:
+              name: voll-med-configmap           # O ConfigMap de onde esse valor vem.
+              key: DB_DATABASE # A chave que deve ser buscada.
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: voll-med-secret
+              key: DB_PASSWORD
+              #optional: false # valor padrão; "mysecret" deve existir
+                              # e incluir uma chave com o nome "username"

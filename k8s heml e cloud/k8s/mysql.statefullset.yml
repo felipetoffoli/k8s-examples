@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql-vollmed
+spec:
+  selector:
+    matchLabels:
+      app: mysql-vollmed # has to match .spec.template.metadata.labels
+  serviceName: "mysql-vollmed"
+  replicas: 1 # by default is 1
+  minReadySeconds: 10 # by default is 0
+  template:
+    metadata:
+      labels:
+        app: mysql-vollmed # has to match .spec.selector.matchLabels
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: mysql-vollmed
+        image: mysql:8.3.0
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: conf.d
+          mountPath: /etc/mysql/conf.d
+        
+        env:
+
+          - name: MYSQL_DATABASE # Note que aqui a variável está definida em caixa alta,
+                                      # diferente da chave no ConfigMap.
+            valueFrom:
+              configMapKeyRef:
+                name: voll-med-configmap           # O ConfigMap de onde esse valor vem.
+                key: DB_DATABASE # A chave que deve ser buscada.
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: voll-med-secret
+                key: DB_PASSWORD
+  volumeClaimTemplates:
+  - metadata:
+      name: www
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "my-storage-class"
+      resources:
+        requests:
+          storage: 1Gi
