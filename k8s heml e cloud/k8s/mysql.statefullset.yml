@@ -1,3 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-vollmed
+  labels:
+    app: mysql-vollmed
+spec:
+  ports:
+  - port: 3306
+    name: mysql
+  clusterIP: None
+  selector:
+    app: mysql-vollmed
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -15,7 +29,7 @@ spec:
         app: mysql-vollmed
     spec:
       terminationGracePeriodSeconds: 10
-      volumes:  # Definindo volumes no nível do pod
+      volumes:
       - name: voll-med-mysql-ps
         persistentVolumeClaim:
           claimName: voll-med-mysql-pvc
@@ -29,13 +43,65 @@ spec:
         - name: voll-med-mysql-ps
           mountPath: /var/lib/mysql
         env:
-          - name: MYSQL_DATABASE
-            valueFrom:
-              configMapKeyRef:
-                name: voll-med-configmap
-                key: DB_DATABASE
-          - name: MYSQL_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: voll-med-secret
-                key: DB_PASSWORD
+        - name: MYSQL_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: voll-med-configmap
+              key: DB_DATABASE
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: voll-med-secret
+              key: DB_PASSWORD
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: voll-med-secret
+              key: DB_PASSWORD
+              
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: backup-mysql-vollmed
+spec:
+  schedule: "0 3 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: mysqldump-vollmed
+            image: leonardosartorello/mysqldump:v4
+            imagePullPolicy: IfNotPresent
+            env:
+            # Define as variáveis de ambiente
+            - name: MYSQL_ENV_DB_HOST # Note que aqui a variável está definida em caixa alta,
+                                        # diferente da chave no ConfigMap.
+              valueFrom:
+                configMapKeyRef:
+                  name: voll-med-configmap           # O ConfigMap de onde esse valor vem.
+                  key: DB_HOST # A chave que deve ser buscada.
+            - name: DB_DATABASE # Note que aqui a variável está definida em caixa alta,
+                                        # diferente da chave no ConfigMap.
+              valueFrom:
+                configMapKeyRef:
+                  name: voll-med-configmap           # O ConfigMap de onde esse valor vem.
+                  key: DB_DATABASE # A chave que deve ser buscada.
+            - name: MYSQL_ENV_DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: voll-med-secret
+                  key: DB_PASSWORD
+            - name: MYSQL_ENV_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: voll-med-secret
+                  key: MYSQL_ENV_DB_USER
+          restartPolicy: OnFailure
+
+
+
+          
+
+

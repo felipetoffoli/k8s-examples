@@ -4,5 +4,5 @@ metadata:
   name: voll-med-configmap
 data:
   # chaves com valores de propriedades; cada chave mapeia para um valor avulso
-  DB_HOST: db
+  DB_HOST: mysql-vollmed
   DB_DATABASE: testemed
