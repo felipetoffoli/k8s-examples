@@ -1,0 +1,15 @@
+controller:
+  kind: daemonset
+  nodeSelector:
+    node-role.kubernetes.io/control-plane: "true"
+    node-role.kubernetes.io/master: "true"
+
+  tolerations:
+  - key: CriticalAddonsOnly
+    operator: Equal
+    value: "true"
+  - key: node-role.kubernetes.io/etcd
+    operator: Exists
+  - key: node-role.kubernetes.io/control-plane
+    operator: Exists
+  replicaCount: 3

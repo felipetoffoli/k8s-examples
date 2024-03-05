@@ -39,9 +39,9 @@ spec:
         ports:
         - containerPort: 3306
           name: mysql
-        volumeMounts:
-        - name: voll-med-mysql-ps
-          mountPath: /var/lib/mysql
+        # volumeMounts:
+        # - name: voll-med-mysql-ps
+        #   mountPath: /var/lib/mysql
         env:
         - name: MYSQL_DATABASE
           valueFrom:

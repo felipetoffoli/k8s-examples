@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vollmed-redis-configmap
+data:
+  REDIS_HOST: my-release-redis-master.default.svc.cluster.local
